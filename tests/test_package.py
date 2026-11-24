@@ -18,7 +18,12 @@ SAMPLE_LLMS = """# dottxt Tool-call Index
 ## Models
 
 - [DeepSeek V4.1 Flash](https://providers.dottxt.ai/models/deepseek-v4.1-flash.json): `deepseek/deepseek-v4.1-flash`, by DeepSeek
+- [Kimi K3](https://providers.dottxt.ai/m/moonshotai/kimi-k3.json): `moonshotai/kimi-k3`, by Moonshot AI
 - [Gemma 3 27B](https://providers.dottxt.ai/models/gemma-3-27b-it.json): `google/gemma-3-27b-it`, by Google; no recommendation: fewer than two providers
+
+## Providers
+
+- [DeepSeek](https://providers.dottxt.ai/providers/deepseek.json): `deepseek`, 0.50% across 1 model
 """
 
 SAMPLE_MODEL_DOC = {
@@ -303,6 +308,11 @@ class DocCodeExamplesTests(unittest.TestCase):
 
         url = ns["resolve_model_url"]("deepseek/deepseek-v4.1-flash", SAMPLE_LLMS)
         self.assertEqual(url, "https://providers.dottxt.ai/models/deepseek-v4.1-flash.json")
+        self.assertEqual(
+            ns["resolve_model_url"]("moonshotai/kimi-k3", SAMPLE_LLMS),
+            "https://providers.dottxt.ai/m/moonshotai/kimi-k3.json",
+        )
+        self.assertIsNone(ns["resolve_model_url"]("deepseek", SAMPLE_LLMS))
         self.assertIsNone(ns["resolve_model_url"]("missing/model", SAMPLE_LLMS))
 
         fresh = datetime(2026, 10, 16, 12, tzinfo=UTC)
@@ -353,6 +363,11 @@ assert.equal(
   resolveModelUrl("deepseek/deepseek-v4.1-flash", llms),
   "https://providers.dottxt.ai/models/deepseek-v4.1-flash.json",
 );
+assert.equal(
+  resolveModelUrl("moonshotai/kimi-k3", llms),
+  "https://providers.dottxt.ai/m/moonshotai/kimi-k3.json",
+);
+assert.equal(resolveModelUrl("deepseek", llms), null);
 const fresh = validateRoutingBlock(doc, new Date("2026-10-16T12:00:00Z"));
 assert.equal(fresh.actionable, true);
 assert.equal(fresh.asOf, "2026-10-15T19:00:00Z");

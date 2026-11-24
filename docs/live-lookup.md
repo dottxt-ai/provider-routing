@@ -7,9 +7,10 @@ model.
 ## Step-by-step protocol
 
 1. **Resolve the model file URL** from `https://providers.dottxt.ai/llms.txt`. Match the exact
-   OpenRouter model ID in backticks (for example `` `deepseek/deepseek-v4.1-flash` ``) to get
-   its `models/{name}.json` link.
-2. **Fetch `models/{name}.json`** directly.
+   OpenRouter model ID in backticks (for example `` `deepseek/deepseek-v4.1-flash` ``) under
+   `## Models` to get its canonical JSON link (follow the link in `llms.txt` rather than
+   guessing a path, so URL or slug changes never break lookup).
+2. **Fetch that model JSON URL** directly.
 3. **Validate status, expiry, and invariants** before recommending a routing:
    - `status == "ok"` (otherwise report `status_reason` and do **not** recommend a routing).
    - Current UTC time `< valid_until` (ISO 8601 UTC).
@@ -51,14 +52,23 @@ def fetch_text(url: str) -> str:
 
 
 def resolve_model_url(openrouter_model_id: str, llms_txt: str) -> str | None:
-    """Find the live models/{name}.json URL for an OpenRouter model id in llms.txt."""
-    pattern = re.compile(
-        r"^- \[[^\]]+\]\(([^)]+/models/[^)]+\.json)\):\s*`([^`]+)`",
-        re.MULTILINE,
-    )
-    for url, model_id in pattern.findall(llms_txt):
-        if model_id == openrouter_model_id:
-            return url
+    """Find the live model JSON URL for an OpenRouter model id under ``## Models`` in llms.txt.
+
+    Follows whatever canonical JSON URL ``llms.txt`` publishes (e.g. ``/models/{name}.json`` or
+    ``/m/{org}/{model}.json``) rather than assuming a fixed path layout.
+    """
+    in_models = False
+    line_re = re.compile(r"^- \[[^\]]+\]\((https?://[^)]+\.json)\):\s*`([^`]+)`")
+    for line in llms_txt.splitlines():
+        if line.startswith("## "):
+            in_models = line.strip() == "## Models"
+            continue
+        if not in_models:
+            continue
+        if match := line_re.match(line):
+            url, model_id = match.groups()
+            if model_id == openrouter_model_id:
+                return url
     return None
 
 
@@ -170,9 +180,16 @@ interface RoutingBlock {
 }
 
 export function resolveModelUrl(openrouterModelId: string, llmsTxt: string): string | null {
-  const regex = /^- \[[^\]]+\]\(([^)]+\/models\/[^)]+\.json)\):\s*`([^`]+)`/gm;
-  for (const match of llmsTxt.matchAll(regex)) {
-    if (match[2] === openrouterModelId) {
+  let inModels = false;
+  const lineRe = /^- \[[^\]]+\]\((https?:\/\/[^)]+\.json)\):\s*`([^`]+)`/;
+  for (const line of llmsTxt.split(/\r?\n/)) {
+    if (line.startsWith("## ")) {
+      inModels = line.trim() === "## Models";
+      continue;
+    }
+    if (!inModels) continue;
+    const match = line.match(lineRe);
+    if (match && match[2] === openrouterModelId) {
       return match[1];
     }
   }
