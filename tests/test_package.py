@@ -240,6 +240,10 @@ class PackageStructureTests(unittest.TestCase):
         self.assertTrue(cfg["folders"])
         for folder in cfg["folders"]:
             self.assertTrue((ROOT / folder).is_dir(), f"Missing Context7 folder: {folder}")
+        for idx, rule in enumerate(cfg["rules"]):
+            self.assertLessEqual(
+                len(rule), 255, f"context7.json rules[{idx}] exceeds 255 chars ({len(rule)})"
+            )
         joined_rules = "\n".join(cfg["rules"])
         self.assertIn("https://providers.dottxt.ai/llms.txt", joined_rules)
         self.assertIn("valid_until", joined_rules)

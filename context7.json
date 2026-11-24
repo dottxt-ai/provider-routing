@@ -15,7 +15,7 @@
     "Act on a model's recommendation only when status is 'ok' and the current UTC time is strictly before valid_until; otherwise report status_reason and do not recommend a routing configuration.",
     "Always cite the model JSON's as_of observation date alongside measured error rates, sample sizes, and confidence.",
     "Use top-level invalid_tool_call_rate and recommendation for tool calling; use structured_outputs (structured_output_error_rate and its own status, valid_until, and recommendation) for response_format / structured-output workloads.",
-    "When updating an OpenRouter provider configuration, replace order and ignore, remove sort, and preserve existing policy and capability constraints (allow_fallbacks, require_parameters, data_collection, zdr, enforce_distillable_text, quantizations, max_price, preferred_min_throughput, preferred_max_latency, and only). Flag conflicts rather than weakening constraints.",
+    "When merging OpenRouter provider config, replace order and ignore, drop sort, and preserve existing policy/capability fields (zdr, data_collection, allow_fallbacks, require_parameters, quantizations, max_price, only); flag conflicts.",
     "Scope these instructions to OpenRouter provider selection, routing updates, and OpenRouter tool-call or structured-output failures — not unrelated local JSON parsing or schema bugs."
   ]
 }
