@@ -4,7 +4,7 @@ Apply this rule only when choosing or updating OpenRouter `provider` routing, or
 
 ## Required workflow
 
-1. **Fetch live evidence — never use cached rankings.** Fetch `https://providers.dottxt.ai/llms.txt` to find the model's `models/{name}.json` link, then fetch that model JSON file directly (do not fetch `data.json` for single-model routing).
+1. **Fetch live evidence — never use cached rankings.** Fetch `https://providers.dottxt.ai/m/{openrouter_id}.json` directly (or `https://providers.dottxt.ai/m/{openrouter_id}.md` for answer-first Markdown), or check `https://providers.dottxt.ai/llms.txt` to confirm coverage or resolve an unknown model id (do not fetch `data.json` for single-model routing).
 2. **Validate before acting.** Check `status`, `as_of`, `valid_until`, `confidence`, and `sample_size`. Recommend a routing only when `status` is `ok` and current UTC time is before `valid_until`; otherwise report `status_reason` and do not emit a routing config. Reject contradictory data where an `ignore` slug matches any slug in `order`.
 3. **Use the right metric.** Use top-level `invalid_tool_call_rate` and `recommendation` for tool calling. Use `structured_outputs` (`structured_output_error_rate`, its own `status`, `valid_until`, and `recommendation`) for `response_format` workloads; join price, throughput, and uptime from top-level `providers` by `id`. Providers at or above 3% are ignored unless ignoring their slug would skip a reliable variant.
 4. **Cite the observation date.** Always report the file's `as_of` timestamp with the measured rates, sample sizes, and confidence.

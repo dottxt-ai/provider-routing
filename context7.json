@@ -3,7 +3,7 @@
   "url": "https://context7.com/dottxt-ai/provider-routing",
   "public_key": "pk_VnkMAr8X3BMbv0KMCe620",
   "projectTitle": "dottxt Tool-call Index (OpenRouter Provider Routing)",
-  "description": "Live OpenRouter provider reliability lookup and routing instructions for tool calling and structured outputs (providers.dottxt.ai). Fetch current model JSON via llms.txt, validate status and valid_until expiry, cite the as_of observation date, and merge OpenRouter provider.order/ignore settings while preserving privacy and policy constraints.",
+  "description": "Live OpenRouter provider reliability lookup and routing instructions for tool calling and structured outputs (providers.dottxt.ai). Fetch https://providers.dottxt.ai/m/{openrouter_id}.json or .md directly (or llms.txt), validate status and valid_until expiry, cite as_of, and merge provider.order/ignore while preserving constraints.",
   "folders": [
     "docs",
     "skills"
@@ -13,7 +13,7 @@
     "tests"
   ],
   "rules": [
-    "Never use cached, remembered, or indexed provider rankings or error rates as current routing advice. Always fetch https://providers.dottxt.ai/llms.txt to find the target model's models/{name}.json link, then fetch that live JSON file directly.",
+    "Never use cached or indexed provider rankings as current advice. Fetch https://providers.dottxt.ai/m/{openrouter_id}.json (or .md) directly, or check https://providers.dottxt.ai/llms.txt for coverage.",
     "Act on a model's recommendation only when status is 'ok' and the current UTC time is strictly before valid_until; otherwise report status_reason and do not recommend a routing configuration.",
     "Always cite the model JSON's as_of observation date alongside measured error rates, sample sizes, and confidence.",
     "Use top-level invalid_tool_call_rate and recommendation for tool calling; use structured_outputs (structured_output_error_rate and its own status, valid_until, and recommendation) for response_format / structured-output workloads.",

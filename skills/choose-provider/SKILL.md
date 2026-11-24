@@ -5,7 +5,7 @@ description: "Choose, debug, and update OpenRouter provider routing when configu
 
 # Choose an OpenRouter provider
 
-Fetch `https://providers.dottxt.ai/llms.txt?via=skill` at the start of each request, then fetch the requested model's linked JSON file with `?via=skill` added to its address. Use those live files rather than cached measurements or the large `data.json` file, verify `status` and `valid_until` before recommending a routing, and always cite the file's `as_of` observation date.
+Fetch `https://providers.dottxt.ai/m/{openrouter_id}.json?via=skill` directly when you know the model's OpenRouter id (or `m/{openrouter_id}.md?via=skill` for answer-first Markdown); fetch `https://providers.dottxt.ai/llms.txt?via=skill` first when you need to check coverage or find an unknown model id. Use those live files rather than cached measurements or the large `data.json` file, verify `status` and `valid_until` before recommending a routing, and always cite the file's `as_of` observation date.
 
 ## Workflow
 
@@ -21,8 +21,10 @@ numbers, diagnosing a provider, or proposing a routing.
 
 Gather what you need first:
 
-- The model's live file, listed in `llms.txt` (`models/{name}.json`, usually its
-  OpenRouter id without the maker). Fetch that file, not `data.json`.
+- The model's live file: fetch `https://providers.dottxt.ai/m/{openrouter_id}.json`
+  directly (or `m/{openrouter_id}.md` for answer-first Markdown), or check
+  `llms.txt` when verifying coverage or resolving an unknown id. Do not fetch
+  `data.json` for a single model.
 - The user's current `provider` configuration, failing provider (if debugging),
   and any stated constraints or priorities.
 

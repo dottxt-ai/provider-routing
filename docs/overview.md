@@ -6,8 +6,9 @@ OpenRouter**.
 
 > **Live evidence rule:** Rankings change daily as providers deploy fixes or regress. Never
 > recommend providers from cached docs or memory. Always fetch live data from
-> `https://providers.dottxt.ai/llms.txt` and the model's `models/{name}.json`, verify
-> `status == "ok"` and `valid_until`, and cite the file's `as_of` observation date.
+> `https://providers.dottxt.ai/m/{openrouter_id}.json` (or `m/{openrouter_id}.md`, or check
+> `https://providers.dottxt.ai/llms.txt` for coverage), verify `status == "ok"` and
+> `valid_until`, and cite the file's `as_of` observation date.
 
 ## What is measured
 
@@ -60,11 +61,19 @@ tier, and other labels (`baseten/fp8`, `baseten/fast`, `mistral/zdr`):
 
 | Endpoint | Purpose | When to fetch |
 | --- | --- | --- |
-| `https://providers.dottxt.ai/llms.txt` | Model and provider index with links | Start of every lookup to resolve `models/{name}.json` |
-| `https://providers.dottxt.ai/models/{name}.json` | Full measurements and routing for one model | Every single-model routing or debugging task |
+| `https://providers.dottxt.ai/m/{openrouter_id}.json` | Direct full JSON measurements and routing for one model | Primary endpoint for programmatic single-model routing or debugging |
+| `https://providers.dottxt.ai/m/{openrouter_id}.md` | Direct answer-first Markdown (recommendation, `provider` JSON, `as_of`/`valid_until`, provider table) | Fast agent-friendly reading for one model (also served by `m/{openrouter_id}/` with `Accept: text/markdown`) |
+| `https://providers.dottxt.ai/m/{openrouter_id}/` | Canonical HTML model page | Human review or `Accept: text/markdown` content negotiation |
+| `https://providers.dottxt.ai/llms.txt` | Complete index of every measured model and provider | Checking coverage or finding an unknown OpenRouter model ID |
 | `https://providers.dottxt.ai/providers/{slug}.json` | One provider's rates across all models it serves | Auditing one provider across models (use the model file for routing) |
 | `https://providers.dottxt.ai/schema.json` | JSON Schema (2020-12) contract | Programmatic validation |
 | `https://providers.dottxt.ai/data.json` | All models in one large JSON file | Bulk offline analysis only — do not fetch for a single model |
+
+`m/{openrouter_id}.json`, `m/{openrouter_id}.md`, and `m/{openrouter_id}/` are served directly
+at the lowercased OpenRouter model ID (not redirects). Non-canonical variations — uppercase
+paths, dated permaslugs, unambiguous org-less names, or `:free`/`:nitro` suffixes — redirect
+to the canonical `/m/{openrouter_id}` URL. The legacy `models/{name}.json` path also remains
+available with identical JSON.
 
 ## Update cadence and expiry
 

@@ -10,9 +10,9 @@ price, throughput, uptime, and data-policy evidence from `https://providers.dott
 without ever caching daily rankings that go stale.
 
 > **Important:** Do not treat cached documentation or memorized provider lists as current
-> routing advice. Always fetch `https://providers.dottxt.ai/llms.txt` and the target model's
-> live model JSON file, verify `status == "ok"` and `valid_until`, and cite the `as_of`
-> observation date.
+> routing advice. Always fetch `https://providers.dottxt.ai/m/{openrouter_id}.json` (or
+> `m/{openrouter_id}.md`, or check `https://providers.dottxt.ai/llms.txt` for coverage),
+> verify `status == "ok"` and `valid_until`, and cite the `as_of` observation date.
 
 ## Install the `choose-provider` Agent Skill
 
@@ -86,8 +86,10 @@ examples with zero hardcoded daily rankings:
 
 ## Live endpoints on `providers.dottxt.ai`
 
-- `https://providers.dottxt.ai/llms.txt` — discovery map with links to every model's JSON file
-- `https://providers.dottxt.ai/models/{name}.json` — single-model measurements and routing
+- `https://providers.dottxt.ai/m/{openrouter_id}.json` — direct per-model JSON at the exact OpenRouter model ID (e.g. `m/deepseek/deepseek-v3.2.json`)
+- `https://providers.dottxt.ai/m/{openrouter_id}.md` — direct answer-first Markdown summary (recommendation, `provider` JSON, `as_of`/`valid_until`, provider table)
+- `https://providers.dottxt.ai/m/{openrouter_id}/` — canonical HTML model page (returns `m/{openrouter_id}.md` directly when sent `Accept: text/markdown`)
+- `https://providers.dottxt.ai/llms.txt` — discovery map with links to every measured model and provider
 - `https://providers.dottxt.ai/providers/{slug}.json` — single-provider measurements across models
 - `https://providers.dottxt.ai/schema.json` — JSON Schema (2020-12) for all data files
 - `https://providers.dottxt.ai/.well-known/agent-skills/choose-provider/SKILL.md` — domain-hosted skill

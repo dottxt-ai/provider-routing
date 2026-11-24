@@ -1,23 +1,35 @@
 # Live Model Lookup and Expiry Validation
 
-Always resolve and fetch live evidence from `https://providers.dottxt.ai` at request time.
-Never use cached rankings, and never fetch the large `data.json` file when you only need one
-model.
+Always fetch live evidence from `https://providers.dottxt.ai` at request time. Never use
+cached rankings, and never fetch the large `data.json` file when you only need one model.
 
-## Step-by-step protocol
+## Direct per-model URLs (served directly, not redirects)
 
-1. **Resolve the model file URL** from `https://providers.dottxt.ai/llms.txt`. Match the exact
-   OpenRouter model ID in backticks (for example `` `deepseek/deepseek-v4.1-flash` ``) under
-   `## Models` to get its canonical JSON link (follow the link in `llms.txt` rather than
-   guessing a path, so URL or slug changes never break lookup).
-2. **Fetch that model JSON URL** directly.
-3. **Validate status, expiry, and invariants** before recommending a routing:
+Every measured model has canonical URLs built directly from its lowercased OpenRouter model ID
+(for example `deepseek/deepseek-v3.2`):
+
+| URL | Format | Use when |
+| --- | --- | --- |
+| `https://providers.dottxt.ai/m/{openrouter_id}.json` | Full per-model JSON (`schema.json` `#/$defs/model`) | Programmatic lookup, validation, and routing merges |
+| `https://providers.dottxt.ai/m/{openrouter_id}.md` | Answer-first Markdown (recommendation, `provider` JSON, `as_of`/`valid_until`, provider table) | Quick human or agent reading |
+| `https://providers.dottxt.ai/m/{openrouter_id}/` | Canonical HTML page (returns `m/{openrouter_id}.md` directly when sent `Accept: text/markdown`) | Browser view or Markdown content negotiation |
+| `https://providers.dottxt.ai/llms.txt` | Full catalog of every measured model and provider | Checking coverage or finding an unknown OpenRouter model ID |
+
+Only non-canonical variations (uppercase paths, dated permaslugs, unambiguous org-less names,
+or `:free`/`:nitro` suffixes) redirect to the canonical `/m/{openrouter_id}` URL.
+
+## Validation protocol
+
+1. **Fetch `https://providers.dottxt.ai/m/{openrouter_id}.json`** directly (or
+   `m/{openrouter_id}.md` for answer-first Markdown). Use `https://providers.dottxt.ai/llms.txt`
+   if you need to check coverage or find an unknown model ID.
+2. **Validate status, expiry, and invariants** before recommending a routing:
    - `status == "ok"` (otherwise report `status_reason` and do **not** recommend a routing).
    - Current UTC time `< valid_until` (ISO 8601 UTC).
    - `recommendation` is non-null with `order` and `ignore`.
    - No slug in `recommendation.ignore` matches any slug in `recommendation.order` (accounting
      for prefix matching, e.g. `baseten` matches `baseten/fp8`).
-4. **Cite the observation date (`as_of`)** alongside `confidence`, `sample_size`, and measured
+3. **Cite the observation date (`as_of`)** alongside `confidence`, `sample_size`, and measured
    error rates in your response.
 
 ### Non-`ok` statuses
@@ -40,9 +52,20 @@ from __future__ import annotations
 import json
 import re
 from datetime import UTC, datetime
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://providers.dottxt.ai"
+
+
+def model_json_url(openrouter_model_id: str) -> str:
+    """Direct canonical JSON URL for an OpenRouter model id (not a redirect)."""
+    return f"{BASE_URL}/m/{openrouter_model_id.strip().lower()}.json"
+
+
+def model_markdown_url(openrouter_model_id: str) -> str:
+    """Direct canonical answer-first Markdown URL for an OpenRouter model id."""
+    return f"{BASE_URL}/m/{openrouter_model_id.strip().lower()}.md"
 
 
 def fetch_text(url: str) -> str:
@@ -52,11 +75,7 @@ def fetch_text(url: str) -> str:
 
 
 def resolve_model_url(openrouter_model_id: str, llms_txt: str) -> str | None:
-    """Find the live model JSON URL for an OpenRouter model id under ``## Models`` in llms.txt.
-
-    Follows whatever canonical JSON URL ``llms.txt`` publishes (e.g. ``/models/{name}.json`` or
-    ``/m/{org}/{model}.json``) rather than assuming a fixed path layout.
-    """
+    """Optional catalog lookup: check coverage or find a model's JSON URL in llms.txt."""
     in_models = False
     line_re = re.compile(r"^- \[[^\]]+\]\((https?://[^)]+\.json)\):\s*`([^`]+)`")
     for line in llms_txt.splitlines():
@@ -134,16 +153,24 @@ def validate_recommendation(
 
 
 def lookup_live_routing(openrouter_model_id: str, *, structured_outputs: bool = False) -> dict:
-    llms_txt = fetch_text(f"{BASE_URL}/llms.txt")
-    model_url = resolve_model_url(openrouter_model_id, llms_txt)
-    if not model_url:
-        raise LookupError(f"{openrouter_model_id} is not listed in {BASE_URL}/llms.txt")
+    """Fetch the model's canonical JSON directly at /m/{openrouter_id}.json and validate it."""
+    url = model_json_url(openrouter_model_id)
+    try:
+        doc = json.loads(fetch_text(url))
+    except HTTPError as exc:
+        if exc.code == 404:
+            raise LookupError(
+                f"{openrouter_model_id} is not measured at {url}; "
+                f"check {BASE_URL}/llms.txt for covered models."
+            ) from exc
+        raise
 
-    doc = json.loads(fetch_text(model_url))
     ok, message, rec = validate_recommendation(doc, structured_outputs=structured_outputs)
+    view = doc["structured_outputs"] if structured_outputs else doc
     return {
         "model_id": doc["model"]["id"],
-        "as_of": (doc["structured_outputs"] if structured_outputs else doc)["as_of"],
+        "url": url,
+        "as_of": view["as_of"],
         "actionable": ok,
         "message": message,
         "provider": rec,
@@ -177,6 +204,14 @@ interface RoutingBlock {
   recommendation: { order: string[]; ignore: string[] } | null;
   providers: ProviderEntry[];
   others: ProviderEntry[];
+}
+
+export function modelJsonUrl(openrouterModelId: string): string {
+  return `${BASE_URL}/m/${openrouterModelId.trim().toLowerCase()}.json`;
+}
+
+export function modelMarkdownUrl(openrouterModelId: string): string {
+  return `${BASE_URL}/m/${openrouterModelId.trim().toLowerCase()}.md`;
 }
 
 export function resolveModelUrl(openrouterModelId: string, llmsTxt: string): string | null {
@@ -250,12 +285,15 @@ export async function fetchLiveProviderRouting(
   openrouterModelId: string,
   { structuredOutputs = false } = {},
 ) {
-  const llmsTxt = await (await fetch(`${BASE_URL}/llms.txt`)).text();
-  const modelUrl = resolveModelUrl(openrouterModelId, llmsTxt);
-  if (!modelUrl) {
-    throw new Error(`${openrouterModelId} is not covered by ${BASE_URL}/llms.txt`);
+  const url = modelJsonUrl(openrouterModelId);
+  const resp = await fetch(url);
+  if (resp.status === 404) {
+    throw new Error(`${openrouterModelId} is not measured at ${url}; check ${BASE_URL}/llms.txt.`);
   }
-  const doc = await (await fetch(modelUrl)).json();
+  if (!resp.ok) {
+    throw new Error(`HTTP ${resp.status} fetching ${url}`);
+  }
+  const doc = await resp.json();
   const block: RoutingBlock | null = structuredOutputs ? doc.structured_outputs : doc;
   return validateRoutingBlock(block);
 }
@@ -268,14 +306,8 @@ export async function fetchLiveProviderRouting(
 ```sh
 MODEL_ID="deepseek/deepseek-v3.2"
 
-# 1. Resolve the model's live JSON URL from llms.txt
-MODEL_URL=$(curl -fsSL https://providers.dottxt.ai/llms.txt \
-  | grep "\`${MODEL_ID}\`" \
-  | sed -E 's/.*\((https:\/\/[^)]+\.json)\).*/\1/' \
-  | head -n 1)
-
-# 2. Fetch the model file, verify status == "ok" and valid_until > now, and print as_of + routing
-curl -fsSL "$MODEL_URL" | jq '
+# Direct canonical JSON at /m/{openrouter_id}.json — validate status and expiry
+curl -fsSL "https://providers.dottxt.ai/m/${MODEL_ID}.json" | jq '
   if .status != "ok" then
     error("Not actionable (\(.status)): \(.status_reason) [as_of \(.as_of)]")
   elif (.valid_until | fromdateiso8601) <= now then
@@ -284,4 +316,10 @@ curl -fsSL "$MODEL_URL" | jq '
     {as_of, valid_until, confidence, provider: .recommendation}
   end
 '
+
+# Or fetch the direct answer-first Markdown summary:
+curl -fsSL "https://providers.dottxt.ai/m/${MODEL_ID}.md"
+
+# Equivalent via Markdown content negotiation on the canonical HTML page:
+curl -fsSL -H "Accept: text/markdown" "https://providers.dottxt.ai/m/${MODEL_ID}/"
 ```

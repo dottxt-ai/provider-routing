@@ -1,6 +1,7 @@
 # Tool-Call vs. Structured-Output Rates
 
-Each `models/{name}.json` file carries **two separate rankings** for the same model:
+Each per-model JSON file (`https://providers.dottxt.ai/m/{openrouter_id}.json`) carries **two
+separate rankings** for the same model:
 
 1. **Top-level (`metric: "invalid_tool_call_rate"`)** — for requests that use function/tool
    calling (`tools`).

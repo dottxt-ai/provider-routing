@@ -245,6 +245,7 @@ class PackageStructureTests(unittest.TestCase):
                 len(rule), 255, f"context7.json rules[{idx}] exceeds 255 chars ({len(rule)})"
             )
         joined_rules = "\n".join(cfg["rules"])
+        self.assertIn("https://providers.dottxt.ai/m/{openrouter_id}.json", joined_rules)
         self.assertIn("https://providers.dottxt.ai/llms.txt", joined_rules)
         self.assertIn("valid_until", joined_rules)
         self.assertIn("as_of", joined_rules)
@@ -258,6 +259,7 @@ class PackageStructureTests(unittest.TestCase):
         _, fm, body = skill_text.split("---\n", 2)
         self.assertIn("name: choose-provider", fm)
         self.assertIn("unrelated local JSON", fm)
+        self.assertIn("https://providers.dottxt.ai/m/{openrouter_id}.json?via=skill", body)
         self.assertIn("https://providers.dottxt.ai/llms.txt?via=skill", body)
         self.assertIn("`as_of`", body)
         self.assertIn("`valid_until`", body)
@@ -336,6 +338,14 @@ class DocCodeExamplesTests(unittest.TestCase):
         ns: dict = {}
         exec(blocks[0], ns)
 
+        self.assertEqual(
+            ns["model_json_url"]("DeepSeek/DeepSeek-V3.2"),
+            "https://providers.dottxt.ai/m/deepseek/deepseek-v3.2.json",
+        )
+        self.assertEqual(
+            ns["model_markdown_url"]("deepseek/deepseek-v3.2"),
+            "https://providers.dottxt.ai/m/deepseek/deepseek-v3.2.md",
+        )
         url = ns["resolve_model_url"]("deepseek/deepseek-v4.1-flash", SAMPLE_LLMS)
         self.assertEqual(url, "https://providers.dottxt.ai/models/deepseek-v4.1-flash.json")
         self.assertEqual(
@@ -389,6 +399,14 @@ class DocCodeExamplesTests(unittest.TestCase):
 import assert from "node:assert/strict";
 const llms = """ + json.dumps(SAMPLE_LLMS) + """;
 const doc = """ + json.dumps(SAMPLE_MODEL_DOC) + """;
+assert.equal(
+  modelJsonUrl("DeepSeek/DeepSeek-V3.2"),
+  "https://providers.dottxt.ai/m/deepseek/deepseek-v3.2.json",
+);
+assert.equal(
+  modelMarkdownUrl("deepseek/deepseek-v3.2"),
+  "https://providers.dottxt.ai/m/deepseek/deepseek-v3.2.md",
+);
 assert.equal(
   resolveModelUrl("deepseek/deepseek-v4.1-flash", llms),
   "https://providers.dottxt.ai/models/deepseek-v4.1-flash.json",

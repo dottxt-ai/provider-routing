@@ -20,8 +20,10 @@ generic four-option comparison menu:
 1. **Identify the model and (if available) the provider that served the failing response.**
    OpenRouter includes the `provider` name on response objects (and in OpenRouter Activity logs).
 2. **Fetch live data from `providers.dottxt.ai`:**
-   - Resolve `models/{name}.json` from `https://providers.dottxt.ai/llms.txt`.
-   - Fetch `models/{name}.json`.
+   - Fetch `https://providers.dottxt.ai/m/{openrouter_id}.json` directly (or
+     `https://providers.dottxt.ai/m/{openrouter_id}.md` for answer-first Markdown). Check
+     `https://providers.dottxt.ai/llms.txt` if you need to confirm coverage or look up an
+     unknown OpenRouter model ID.
    - Check `status == "ok"` and `now_utc < valid_until` on the right block:
      - Top-level block for tool calls (`tools`).
      - `doc["structured_outputs"]` for structured outputs (`response_format`).
