@@ -1,0 +1,21 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "dottxt Tool-call Index (OpenRouter Provider Routing)",
+  "description": "Live OpenRouter provider reliability lookup and routing instructions for tool calling and structured outputs (providers.dottxt.ai). Fetch current model JSON via llms.txt, validate status and valid_until expiry, cite the as_of observation date, and merge OpenRouter provider.order/ignore settings while preserving privacy and policy constraints.",
+  "folders": [
+    "docs",
+    "skills"
+  ],
+  "excludeFolders": [
+    ".github",
+    "tests"
+  ],
+  "rules": [
+    "Never use cached, remembered, or indexed provider rankings or error rates as current routing advice. Always fetch https://providers.dottxt.ai/llms.txt to find the target model's models/{name}.json link, then fetch that live JSON file directly.",
+    "Act on a model's recommendation only when status is 'ok' and the current UTC time is strictly before valid_until; otherwise report status_reason and do not recommend a routing configuration.",
+    "Always cite the model JSON's as_of observation date alongside measured error rates, sample sizes, and confidence.",
+    "Use top-level invalid_tool_call_rate and recommendation for tool calling; use structured_outputs (structured_output_error_rate and its own status, valid_until, and recommendation) for response_format / structured-output workloads.",
+    "When updating an OpenRouter provider configuration, replace order and ignore, remove sort, and preserve existing policy and capability constraints (allow_fallbacks, require_parameters, data_collection, zdr, enforce_distillable_text, quantizations, max_price, preferred_min_throughput, preferred_max_latency, and only). Flag conflicts rather than weakening constraints.",
+    "Scope these instructions to OpenRouter provider selection, routing updates, and OpenRouter tool-call or structured-output failures — not unrelated local JSON parsing or schema bugs."
+  ]
+}
