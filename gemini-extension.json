@@ -1,0 +1,5 @@
+{
+  "name": "dottxt-provider-routing",
+  "version": "1.0.0",
+  "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai."
+}

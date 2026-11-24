@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dottxt-provider-routing",
+  "version": "1.0.0",
+  "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai.",
+  "owner": {
+    "name": "dottxt"
+  },
+  "plugins": [
+    {
+      "name": "dottxt-provider-routing",
+      "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai.",
+      "author": {
+        "name": "dottxt"
+      },
+      "category": "development",
+      "source": "./"
+    }
+  ]
+}

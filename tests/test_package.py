@@ -264,7 +264,9 @@ class PackageStructureTests(unittest.TestCase):
 
         rule_paths = [
             ROOT / "rules/cursor/dottxt-provider-routing.mdc",
+            ROOT / "rules/claude/dottxt-provider-routing.md",
             ROOT / "rules/agents-md/dottxt-provider-routing.md",
+            ROOT / "rules/gemini/dottxt-provider-routing.md",
             ROOT / "rules/cline/dottxt-provider-routing.md",
             ROOT / "rules/kilo/dottxt-provider-routing.md",
         ]
@@ -285,6 +287,30 @@ class PackageStructureTests(unittest.TestCase):
             else:
                 bodies.append(text.strip())
         self.assertEqual(len(set(bodies)), 1, "Standing rule bodies must agree across agents")
+
+    def test_native_manifests(self) -> None:
+        claude_plugin = json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(claude_plugin["name"], "dottxt-provider-routing")
+        self.assertEqual(claude_plugin["license"], "MIT")
+
+        claude_mkt = json.loads(
+            (ROOT / ".claude-plugin/marketplace.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(claude_mkt["plugins"][0]["name"], "dottxt-provider-routing")
+        self.assertEqual(claude_mkt["plugins"][0]["source"], "./")
+
+        agy_plugin = json.loads((ROOT / "plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(agy_plugin["name"], "dottxt-provider-routing")
+        self.assertEqual(len(agy_plugin["suggestedPrompts"]), 3)
+
+        gemini_ext = json.loads((ROOT / "gemini-extension.json").read_text(encoding="utf-8"))
+        self.assertEqual(gemini_ext["name"], "dottxt-provider-routing")
+
+        pi_pkg = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertIn("pi-package", pi_pkg["keywords"])
+        self.assertEqual(pi_pkg["pi"], {"skills": ["./skills"]})
+        for skill_dir in pi_pkg["pi"]["skills"]:
+            self.assertTrue((ROOT / skill_dir / "choose-provider/SKILL.md").exists())
 
     def test_docs_have_no_hardcoded_rankings_and_relative_links_resolve(self) -> None:
         md_files = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]

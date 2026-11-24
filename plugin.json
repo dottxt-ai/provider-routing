@@ -1,0 +1,17 @@
+{
+  "name": "dottxt-provider-routing",
+  "displayName": "dottxt Provider Routing",
+  "version": "1.0.0",
+  "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai.",
+  "author": {
+    "name": "dottxt",
+    "url": "https://dottxt.ai"
+  },
+  "homepage": "https://providers.dottxt.ai",
+  "repository": "https://github.com/dottxt-ai/provider-routing",
+  "suggestedPrompts": [
+    "Pick reliable OpenRouter providers for our model using live providers.dottxt.ai data",
+    "Debug why our OpenRouter tool calls are returning invalid JSON arguments",
+    "Update our OpenRouter provider routing for structured outputs without dropping ZDR"
+  ]
+}

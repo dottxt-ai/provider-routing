@@ -1,0 +1,27 @@
+{
+  "name": "@dottxt/provider-routing",
+  "version": "1.0.0",
+  "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai.",
+  "license": "MIT",
+  "homepage": "https://providers.dottxt.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dottxt-ai/provider-routing.git"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "skills",
+    "openrouter",
+    "provider-routing",
+    "tool-calling",
+    "structured-outputs",
+    "reliability",
+    "dottxt"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}
