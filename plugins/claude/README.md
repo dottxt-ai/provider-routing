@@ -3,19 +3,19 @@
 Official Claude Code plugin for the [dottxt Tool-call Index](https://providers.dottxt.ai).
 
 On open-weight models served through OpenRouter, inference providers break tool calls and
-structured outputs at dramatically different rates. This plugin bundles the `choose-provider`
+structured outputs at dramatically different rates. This plugin bundles the `openrouter-provider-routing`
 skill so Claude Code fetches live per-provider reliability, price, throughput, uptime, and
 data-policy evidence from `https://providers.dottxt.ai` whenever you choose, update, or debug
 OpenRouter provider routing — without embedding static rankings that go stale.
 
 ## What the plugin includes
 
-- **Skill:** `choose-provider` (`skills/choose-provider/SKILL.md`)
+- **Skill:** `openrouter-provider-routing` (`skills/openrouter-provider-routing/SKILL.md`)
 - **Zero local scripts, zero hooks, zero MCP servers, and zero API keys required.** All lookups
   are read-only HTTPS GET requests to public JSON and Markdown endpoints on
   `https://providers.dottxt.ai`.
 
-## When `choose-provider` activates
+## When `openrouter-provider-routing` activates
 
 - Selecting OpenRouter providers for an open-weight model that uses tool calling or structured
   outputs (`response_format`).

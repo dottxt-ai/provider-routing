@@ -14,20 +14,20 @@ without ever caching daily rankings that go stale.
 > `m/{openrouter_id}.md`, or check `https://providers.dottxt.ai/llms.txt` for coverage),
 > verify `status == "ok"` and `valid_until`, and cite the `as_of` observation date.
 
-## Install the `choose-provider` Agent Skill
+## Install the `openrouter-provider-routing` Agent Skill
 
 ### Universal (`skills` CLI — Claude Code, Codex, Cursor, Antigravity, Gemini CLI, OpenCode)
 
 Install from the canonical domain (recommended):
 
 ```sh
-npx skills add https://providers.dottxt.ai --skill choose-provider
+npx skills add https://providers.dottxt.ai --skill openrouter-provider-routing
 ```
 
 Or directly from this repository (same generated `SKILL.md`):
 
 ```sh
-npx skills add dottxt-ai/provider-routing --skill choose-provider
+npx skills add dottxt-ai/provider-routing --skill openrouter-provider-routing
 ```
 
 ### Native installs
@@ -41,8 +41,8 @@ npx skills add dottxt-ai/provider-routing --skill choose-provider
   /plugin marketplace add dottxt-ai/provider-routing
   /plugin install dottxt-provider-routing@dottxt-provider-routing
   ```
-- **Cursor plugin** (`plugins/cursor/.cursor-plugin/plugin.json` + `.cursor-plugin/marketplace.json`): bundles `choose-provider` and `rules/dottxt-provider-routing.mdc` (`alwaysApply: false`) for Cursor Marketplace installation.
-- **Gemini CLI extension** (`gemini-extension.json`, auto-discovers `skills/choose-provider/SKILL.md`):
+- **Cursor plugin** (`plugins/cursor/.cursor-plugin/plugin.json` + `.cursor-plugin/marketplace.json`): bundles `openrouter-provider-routing` and `rules/dottxt-provider-routing.mdc` (`alwaysApply: false`) for Cursor Marketplace installation.
+- **Gemini CLI extension** (`gemini-extension.json`, auto-discovers `skills/openrouter-provider-routing/SKILL.md`):
   ```sh
   gemini extensions install https://github.com/dottxt-ai/provider-routing
   ```
@@ -50,7 +50,7 @@ npx skills add dottxt-ai/provider-routing --skill choose-provider
   ```sh
   pi install git:github.com/dottxt-ai/provider-routing
   ```
-- **Antigravity plugin** (`plugin.json` + `skills/choose-provider/SKILL.md`): clone into
+- **Antigravity plugin** (`plugin.json` + `skills/openrouter-provider-routing/SKILL.md`): clone into
   `~/.gemini/config/plugins/dottxt-provider-routing` or install the skill with `npx skills add`.
 - **Context7** (`/dottxt-ai/provider-routing`): verified library at
   `https://context7.com/dottxt-ai/provider-routing`.
@@ -97,7 +97,7 @@ examples with zero hardcoded daily rankings:
 - `https://providers.dottxt.ai/llms.txt` — discovery map with links to every measured model and provider
 - `https://providers.dottxt.ai/providers/{slug}.json` — single-provider measurements across models
 - `https://providers.dottxt.ai/schema.json` — JSON Schema (2020-12) for all data files
-- `https://providers.dottxt.ai/.well-known/agent-skills/choose-provider/SKILL.md` — domain-hosted skill
+- `https://providers.dottxt.ai/.well-known/agent-skills/openrouter-provider-routing/SKILL.md` — domain-hosted skill
 
 ## License
 

@@ -3,7 +3,7 @@
 Official Cursor plugin for the [dottxt Tool-call Index](https://providers.dottxt.ai).
 
 On open-weight models served through OpenRouter, inference providers break tool calls and
-structured outputs at dramatically different rates. This plugin bundles the `choose-provider`
+structured outputs at dramatically different rates. This plugin bundles the `openrouter-provider-routing`
 Agent Skill and an apply-intelligently Cursor rule (`alwaysApply: false`) so Cursor fetches
 live per-provider reliability, price, throughput, uptime, and data-policy evidence from
 `https://providers.dottxt.ai` whenever you choose, update, or debug OpenRouter provider routing
@@ -11,7 +11,7 @@ live per-provider reliability, price, throughput, uptime, and data-policy eviden
 
 ## Included components
 
-- **Skill:** `choose-provider` (`skills/choose-provider/SKILL.md`) — full live lookup,
+- **Skill:** `openrouter-provider-routing` (`skills/openrouter-provider-routing/SKILL.md`) — full live lookup,
   validation, debugging, and constraint-preserving OpenRouter routing workflow.
 - **Rule:** `dottxt-provider-routing.mdc` (`rules/dottxt-provider-routing.mdc`,
   `alwaysApply: false`) — concise standing guidance that triggers only on OpenRouter provider
@@ -42,7 +42,7 @@ Install from the Cursor Marketplace once listed, or install the same skill direc
 Agent Skills CLI:
 
 ```sh
-npx skills add https://providers.dottxt.ai --skill choose-provider
+npx skills add https://providers.dottxt.ai --skill openrouter-provider-routing
 ```
 
 Or copy [`rules/dottxt-provider-routing.mdc`](rules/dottxt-provider-routing.mdc) into your

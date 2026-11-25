@@ -1,5 +1,5 @@
 ---
-name: choose-provider
+name: openrouter-provider-routing
 description: "Choose, debug, and update OpenRouter provider routing when configuring open-weight models or diagnosing OpenRouter invalid tool calls, broken tool arguments, or structured-output failures using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai. Do not trigger for unrelated local JSON parsing or schema bugs."
 ---
 

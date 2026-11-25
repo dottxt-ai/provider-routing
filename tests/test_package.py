@@ -253,12 +253,12 @@ class PackageStructureTests(unittest.TestCase):
         self.assertIn("structured_outputs", joined_rules)
 
     def test_skill_and_rules_present_and_free_of_stale_rankings(self) -> None:
-        skill_path = ROOT / "skills/choose-provider/SKILL.md"
+        skill_path = ROOT / "skills/openrouter-provider-routing/SKILL.md"
         skill_text = skill_path.read_text(encoding="utf-8")
         self.assertLess(len(skill_text), 10_000)
         self.assertTrue(skill_text.startswith("---\n"))
         _, fm, body = skill_text.split("---\n", 2)
-        self.assertIn("name: choose-provider", fm)
+        self.assertIn("name: openrouter-provider-routing", fm)
         self.assertIn("unrelated local JSON", fm)
         self.assertIn("https://providers.dottxt.ai/m/{openrouter_id}.json?via=skill", body)
         self.assertIn("https://providers.dottxt.ai/llms.txt?via=skill", body)
@@ -308,8 +308,8 @@ class PackageStructureTests(unittest.TestCase):
         # Keep the submitted Claude plugin subfolder byte-identical to the root skill/license
         # and free of scripts, other-client manifests, secrets, or shell-pipe examples.
         self.assertEqual(
-            (claude_dir / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
-            (ROOT / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+            (claude_dir / "skills/openrouter-provider-routing/SKILL.md").read_text(encoding="utf-8"),
+            (ROOT / "skills/openrouter-provider-routing/SKILL.md").read_text(encoding="utf-8"),
         )
         self.assertEqual(
             (claude_dir / "LICENSE").read_text(encoding="utf-8"),
@@ -348,11 +348,11 @@ class PackageStructureTests(unittest.TestCase):
         self.assertEqual(cursor_plugin["name"], "dottxt-provider-routing")
         self.assertEqual(cursor_plugin["license"], "MIT")
         self.assertTrue((cursor_dir / cursor_plugin["logo"]).is_file())
-        self.assertTrue((cursor_dir / cursor_plugin["skills"] / "choose-provider/SKILL.md").is_file())
+        self.assertTrue((cursor_dir / cursor_plugin["skills"] / "openrouter-provider-routing/SKILL.md").is_file())
         self.assertTrue((cursor_dir / cursor_plugin["rules"] / "dottxt-provider-routing.mdc").is_file())
         self.assertEqual(
-            (cursor_dir / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
-            (ROOT / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+            (cursor_dir / "skills/openrouter-provider-routing/SKILL.md").read_text(encoding="utf-8"),
+            (ROOT / "skills/openrouter-provider-routing/SKILL.md").read_text(encoding="utf-8"),
         )
         self.assertEqual(
             (cursor_dir / "rules/dottxt-provider-routing.mdc").read_text(encoding="utf-8"),
@@ -379,7 +379,7 @@ class PackageStructureTests(unittest.TestCase):
         self.assertIn("pi-package", pi_pkg["keywords"])
         self.assertEqual(pi_pkg["pi"], {"skills": ["./skills"]})
         for skill_dir in pi_pkg["pi"]["skills"]:
-            self.assertTrue((ROOT / skill_dir / "choose-provider/SKILL.md").exists())
+            self.assertTrue((ROOT / skill_dir / "openrouter-provider-routing/SKILL.md").exists())
 
     def test_docs_have_no_hardcoded_rankings_and_relative_links_resolve(self) -> None:
         md_files = [
