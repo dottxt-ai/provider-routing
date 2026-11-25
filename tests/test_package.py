@@ -292,7 +292,10 @@ class PackageStructureTests(unittest.TestCase):
         self.assertEqual(len(set(bodies)), 1, "Standing rule bodies must agree across agents")
 
     def test_native_manifests(self) -> None:
-        claude_plugin = json.loads((ROOT / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+        claude_dir = ROOT / "plugins/claude"
+        claude_plugin = json.loads(
+            (claude_dir / ".claude-plugin/plugin.json").read_text(encoding="utf-8")
+        )
         self.assertEqual(claude_plugin["name"], "dottxt-provider-routing")
         self.assertEqual(claude_plugin["license"], "MIT")
 
@@ -300,10 +303,35 @@ class PackageStructureTests(unittest.TestCase):
             (ROOT / ".claude-plugin/marketplace.json").read_text(encoding="utf-8")
         )
         self.assertEqual(claude_mkt["plugins"][0]["name"], "dottxt-provider-routing")
-        self.assertEqual(claude_mkt["plugins"][0]["source"], "./")
+        self.assertEqual(claude_mkt["plugins"][0]["source"], "./plugins/claude")
 
-        claude_icon = ROOT / ".claude-plugin/icon.png"
-        self.assertTrue(claude_icon.is_file(), "Missing .claude-plugin/icon.png")
+        # Keep the submitted Claude plugin subfolder byte-identical to the root skill/license
+        # and free of scripts, other-client manifests, secrets, or shell-pipe examples.
+        self.assertEqual(
+            (claude_dir / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+            (ROOT / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            (claude_dir / "LICENSE").read_text(encoding="utf-8"),
+            (ROOT / "LICENSE").read_text(encoding="utf-8"),
+        )
+        allowed_suffixes = {".md", ".json", ".png"}
+        for path in sorted(claude_dir.rglob("*")):
+            if path.is_dir():
+                continue
+            self.assertNotIn(path.name.lower(), {"package.json", "claude.md", "claude.local.md", "agents.md"})
+            self.assertTrue(
+                path.name == "LICENSE" or path.suffix.lower() in allowed_suffixes,
+                f"Disallowed file in Claude plugin subfolder: {path.relative_to(ROOT)}",
+            )
+            if path.suffix.lower() != ".png":
+                text = path.read_text(encoding="utf-8")
+                self.assertFalse(text.startswith("#!"), f"Shebang in {path}")
+                self.assertNotIn("process.env", text, f"Env-var read in {path}")
+                self.assertNotIn("curl ", text, f"curl command in {path}")
+
+        claude_icon = claude_dir / ".claude-plugin/icon.png"
+        self.assertTrue(claude_icon.is_file(), "Missing plugins/claude/.claude-plugin/icon.png")
         icon_bytes = claude_icon.read_bytes()
         self.assertLess(len(icon_bytes), 2 * 1024 * 1024)
         self.assertEqual(icon_bytes[:8], b"\x89PNG\r\n\x1a\n")
@@ -327,7 +355,11 @@ class PackageStructureTests(unittest.TestCase):
             self.assertTrue((ROOT / skill_dir / "choose-provider/SKILL.md").exists())
 
     def test_docs_have_no_hardcoded_rankings_and_relative_links_resolve(self) -> None:
-        md_files = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+        md_files = [
+            ROOT / "README.md",
+            ROOT / "plugins/claude/README.md",
+            *sorted((ROOT / "docs").glob("*.md")),
+        ]
         for path in md_files:
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("Data as of", text, path)

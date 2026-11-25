@@ -14,7 +14,7 @@
         "name": "dottxt"
       },
       "category": "development",
-      "source": "./"
+      "source": "./plugins/claude"
     }
   ]
 }

@@ -32,7 +32,7 @@ npx skills add dottxt-ai/provider-routing --skill choose-provider
 
 ### Native installs
 
-- **Claude Code plugin** (`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`):
+- **Claude Code plugin** (`plugins/claude/.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`):
   ```sh
   claude plugin install dottxt-provider-routing --marketplace dottxt-ai/provider-routing
   ```
