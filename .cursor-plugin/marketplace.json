@@ -1,0 +1,17 @@
+{
+  "name": "dottxt-provider-routing",
+  "owner": {
+    "name": "dottxt"
+  },
+  "metadata": {
+    "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "dottxt-provider-routing",
+      "source": "./plugins/cursor",
+      "description": "Choose, debug, and update OpenRouter provider routing for tool calling and structured outputs using live reliability, price, throughput, uptime, and data-policy evidence from providers.dottxt.ai."
+    }
+  ]
+}

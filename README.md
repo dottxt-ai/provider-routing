@@ -41,6 +41,7 @@ npx skills add dottxt-ai/provider-routing --skill choose-provider
   /plugin marketplace add dottxt-ai/provider-routing
   /plugin install dottxt-provider-routing@dottxt-provider-routing
   ```
+- **Cursor plugin** (`plugins/cursor/.cursor-plugin/plugin.json` + `.cursor-plugin/marketplace.json`): bundles `choose-provider` and `rules/dottxt-provider-routing.mdc` (`alwaysApply: false`) for Cursor Marketplace installation.
 - **Gemini CLI extension** (`gemini-extension.json`, auto-discovers `skills/choose-provider/SKILL.md`):
   ```sh
   gemini extensions install https://github.com/dottxt-ai/provider-routing

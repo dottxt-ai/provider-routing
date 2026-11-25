@@ -341,6 +341,33 @@ class PackageStructureTests(unittest.TestCase):
         self.assertGreaterEqual(width, 512)
         self.assertLessEqual(width, 2048)
 
+        cursor_dir = ROOT / "plugins/cursor"
+        cursor_plugin = json.loads(
+            (cursor_dir / ".cursor-plugin/plugin.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(cursor_plugin["name"], "dottxt-provider-routing")
+        self.assertEqual(cursor_plugin["license"], "MIT")
+        self.assertTrue((cursor_dir / cursor_plugin["logo"]).is_file())
+        self.assertTrue((cursor_dir / cursor_plugin["skills"] / "choose-provider/SKILL.md").is_file())
+        self.assertTrue((cursor_dir / cursor_plugin["rules"] / "dottxt-provider-routing.mdc").is_file())
+        self.assertEqual(
+            (cursor_dir / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+            (ROOT / "skills/choose-provider/SKILL.md").read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            (cursor_dir / "rules/dottxt-provider-routing.mdc").read_text(encoding="utf-8"),
+            (ROOT / "rules/cursor/dottxt-provider-routing.mdc").read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            (cursor_dir / "LICENSE").read_text(encoding="utf-8"),
+            (ROOT / "LICENSE").read_text(encoding="utf-8"),
+        )
+        cursor_mkt = json.loads(
+            (ROOT / ".cursor-plugin/marketplace.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(cursor_mkt["plugins"][0]["name"], "dottxt-provider-routing")
+        self.assertEqual(cursor_mkt["plugins"][0]["source"], "./plugins/cursor")
+
         agy_plugin = json.loads((ROOT / "plugin.json").read_text(encoding="utf-8"))
         self.assertEqual(agy_plugin["name"], "dottxt-provider-routing")
         self.assertEqual(len(agy_plugin["suggestedPrompts"]), 3)
@@ -358,6 +385,7 @@ class PackageStructureTests(unittest.TestCase):
         md_files = [
             ROOT / "README.md",
             ROOT / "plugins/claude/README.md",
+            ROOT / "plugins/cursor/README.md",
             *sorted((ROOT / "docs").glob("*.md")),
         ]
         for path in md_files:

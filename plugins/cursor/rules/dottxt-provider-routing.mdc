@@ -1,0 +1,17 @@
+---
+description: Use live reliability data from providers.dottxt.ai when configuring OpenRouter provider routing or debugging OpenRouter invalid tool calls, broken tool arguments, or structured-output failures. Do not trigger for unrelated local JSON parsing or schema bugs.
+alwaysApply: false
+---
+
+# OpenRouter provider routing (dottxt Tool-call Index)
+
+Apply this rule only when choosing or updating OpenRouter `provider` routing, or when debugging OpenRouter invalid tool calls (invalid JSON, unknown function, schema mismatch) or OpenRouter structured-output (`response_format`) failures. Do not apply it to unrelated local JSON parsing or schema bugs.
+
+## Required workflow
+
+1. **Fetch live evidence — never use cached rankings.** Fetch `https://providers.dottxt.ai/m/{openrouter_id}.json` directly (or `https://providers.dottxt.ai/m/{openrouter_id}.md` for answer-first Markdown), or check `https://providers.dottxt.ai/llms.txt` to confirm coverage or resolve an unknown model id (do not fetch `data.json` for single-model routing).
+2. **Validate before acting.** Check `status`, `as_of`, `valid_until`, `confidence`, and `sample_size`. Recommend a routing only when `status` is `ok` and current UTC time is before `valid_until`; otherwise report `status_reason` and do not emit a routing config. Reject contradictory data where an `ignore` slug matches any slug in `order`.
+3. **Use the right metric.** Use top-level `invalid_tool_call_rate` and `recommendation` for tool calling. Use `structured_outputs` (`structured_output_error_rate`, its own `status`, `valid_until`, and `recommendation`) for `response_format` workloads; join price, throughput, and uptime from top-level `providers` by `id`. Providers at or above 3% are ignored unless ignoring their slug would skip a reliable variant.
+4. **Cite the observation date.** Always report the file's `as_of` timestamp with the measured rates, sample sizes, and confidence.
+5. **Match the user's intent.** For debugging tasks, diagnose the failing provider and propose a targeted fix without stalling in a multi-option menu. For already-constrained or explicitly authorized edits, validate constraints and produce the config/diff directly. For open-ended selection, present up to four non-dominated tradeoffs conversationally and ask before editing.
+6. **Preserve existing OpenRouter constraints.** Start from the existing `provider` object: replace `order` and `ignore`, remove `sort`, and preserve `allow_fallbacks`, `require_parameters`, `data_collection`, `zdr`, `enforce_distillable_text`, `quantizations`, `max_price`, `preferred_min_throughput`, `preferred_max_latency`, and `only`. Flag conflicts instead of weakening privacy, residency, price, or capability rules. Never put `:free` endpoints in `order` or `ignore`, and use regional tags from `endpoints` for `eu.openrouter.ai` or `us.openrouter.ai`.
