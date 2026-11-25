@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -300,6 +301,17 @@ class PackageStructureTests(unittest.TestCase):
         )
         self.assertEqual(claude_mkt["plugins"][0]["name"], "dottxt-provider-routing")
         self.assertEqual(claude_mkt["plugins"][0]["source"], "./")
+
+        claude_icon = ROOT / ".claude-plugin/icon.png"
+        self.assertTrue(claude_icon.is_file(), "Missing .claude-plugin/icon.png")
+        icon_bytes = claude_icon.read_bytes()
+        self.assertLess(len(icon_bytes), 2 * 1024 * 1024)
+        self.assertEqual(icon_bytes[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual(icon_bytes[12:16], b"IHDR")
+        width, height = struct.unpack(">II", icon_bytes[16:24])
+        self.assertEqual(width, height, "Claude plugin icon must be square")
+        self.assertGreaterEqual(width, 512)
+        self.assertLessEqual(width, 2048)
 
         agy_plugin = json.loads((ROOT / "plugin.json").read_text(encoding="utf-8"))
         self.assertEqual(agy_plugin["name"], "dottxt-provider-routing")
